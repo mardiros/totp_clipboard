@@ -15,6 +15,7 @@ Currently `totp-clipboard` does not support seeds management (CRUD operation).
 
 
 You can edit the file manually to add seeds by writing this file.
-The file permission on the file shoud be `-rw-------`.
+
+The file permission shoud be `-rw-------`.
 
 The file format is `{"seed label": "BASE32 ENCODED SEED", "seed label2": "ANOTHER BASE32 ENCODED SEED"}`.

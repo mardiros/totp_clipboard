@@ -6,11 +6,11 @@ authors = ["Guillaume Gauvrit <guillaume@gauvr.it>"]
 readme = "README.md"
 keywords = ["totp", "systray", "application"]
 categories = ["GUI", "Authentication"]
-description = """Simple HTTP Client."""
+description = """GUI TOTP client to get totp code in two click."""
 license = "BSD-3-Clause"
-documentation = "https://docs.rs/crate/cabot"
-#homepage = "https://github.com/mardiros/cabot"
-repository = "https://github.com/mardiros/cabot"
+#documentation = "https://docs.rs/crate/totp_clipboard"
+homepage = "https://github.com/mardiros/totp_clipboard"
+repository = "https://github.com/mardiros/totp_clipboard"
 
 
 [[bin]]
