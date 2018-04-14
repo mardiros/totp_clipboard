@@ -2,17 +2,16 @@
 extern crate log;
 extern crate pretty_env_logger;
 
-extern crate libreauth;
 extern crate clipboard;
 extern crate libappindicator;
+extern crate libreauth;
 extern crate serde_json;
 
 extern crate gtk;
 extern crate gtk_sys;
 
-
-mod seeds;
 mod applet;
+mod seeds;
 
 fn main() {
     pretty_env_logger::init();

@@ -1,28 +1,27 @@
-use gtk::{self, WidgetExt, MenuShellExt, MenuItemExt};
+use gtk::{self, MenuItemExt, MenuShellExt, WidgetExt};
 
+use clipboard::{ClipboardContext, ClipboardProvider};
 use libappindicator::{AppIndicator, AppIndicatorStatus};
-use clipboard::{ClipboardProvider, ClipboardContext};
 
 use super::super::seeds::Seeds;
 
 pub struct Applet {
-    seeds: Seeds
+    seeds: Seeds,
 }
 
-
 impl Applet {
-
     pub fn new(seeds: Seeds) -> Self {
-        Applet {
-            seeds: seeds
-        }
+        Applet { seeds: seeds }
     }
 
     pub fn run(&self) {
         gtk::init().unwrap();
         let mut indicator = AppIndicator::new("totp-clipboard", "");
-        
-        indicator.set_icon_full("/usr/share/icons/Adwaita/48x48/status/dialog-password.png", "icon");
+
+        indicator.set_icon_full(
+            "/usr/share/icons/Adwaita/48x48/status/dialog-password.png",
+            "icon",
+        );
         let mut m = gtk::Menu::new();
 
         for seed in self.seeds.get_seeds() {
@@ -42,5 +41,4 @@ impl Applet {
         indicator.set_status(AppIndicatorStatus::APP_INDICATOR_STATUS_ACTIVE);
         gtk::main();
     }
-
 }

@@ -7,8 +7,8 @@ use std::io::{self, ErrorKind};
 use std::env;
 use std::path::PathBuf;
 
-use serde_json;
 use libreauth::oath::TOTPBuilder;
+use serde_json;
 
 pub type IOError = io::Error;
 
@@ -43,7 +43,6 @@ pub fn config_file() -> io::Result<PathBuf> {
     Ok(path)
 }
 
-
 pub fn read_file(filepath: &str) -> io::Result<String> {
     let mut file = File::open(filepath)?;
     let mut buf: Vec<u8> = Vec::new();
@@ -52,15 +51,12 @@ pub fn read_file(filepath: &str) -> io::Result<String> {
     Ok(res)
 }
 
-
-
 pub struct Seed {
     name: String,
     seed: String,
 }
 
 impl Seed {
-
     pub fn name(&self) -> &str {
         self.name.as_str()
     }
@@ -74,42 +70,40 @@ impl Seed {
     }
 }
 
-
 type SeedsMap = HashMap<String, String>;
 
 #[derive(Debug, Clone)]
 pub struct Seeds {
-    seeds: SeedsMap
+    seeds: SeedsMap,
 }
-
 
 impl Seeds {
     pub fn new() -> Self {
         let seeds = SeedsMap::new();
-        let seeds = Seeds {
-            seeds: seeds
-        };
+        let seeds = Seeds { seeds: seeds };
         seeds
     }
 
     pub fn from_file() -> Result<Self, IOError> {
         let filepath = config_file()?;
-        let filepath = filepath.to_str().unwrap();  // crash if ??
+        let filepath = filepath.to_str().unwrap(); // crash if ??
         info!("Try loading workspace from file {}", filepath);
         let cfg = read_file(filepath)?;
         debug!("File {} readed ({} chars.)", filepath, cfg.len());
         let seeds = serde_json::from_str::<SeedsMap>(cfg.as_str()).unwrap(); // crash if the format
-        let seeds = Seeds {
-            seeds: seeds
-        };
+        let seeds = Seeds { seeds: seeds };
         info!("Seeds loaded from file {}", filepath);
         Ok(seeds)
     }
 
-
     pub fn get_seeds(&self) -> Vec<Seed> {
-        let res = self.seeds.iter().map(|(key, val)|{ Seed { name: key.to_owned(), seed: val.to_owned()} } ).collect();
+        let res = self.seeds
+            .iter()
+            .map(|(key, val)| Seed {
+                name: key.to_owned(),
+                seed: val.to_owned(),
+            })
+            .collect();
         res
     }
-
 }
