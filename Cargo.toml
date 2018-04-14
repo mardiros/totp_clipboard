@@ -1,7 +1,21 @@
 [package]
-name = "totp-clipboard"
+name = "totp_clipboard"
 version = "0.1.0"
 authors = ["Guillaume Gauvrit <guillaume@gauvr.it>"]
+
+readme = "README.md"
+keywords = ["totp", "systray", "application"]
+categories = ["GUI", "Authentication"]
+description = """Simple HTTP Client."""
+license = "BSD-3-Clause"
+documentation = "https://docs.rs/crate/cabot"
+#homepage = "https://github.com/mardiros/cabot"
+repository = "https://github.com/mardiros/cabot"
+
+
+[[bin]]
+name = "totp-clipboard"
+path = "src/main.rs"
 
 [dependencies]
 
@@ -12,3 +26,6 @@ libreauth = "^0.8.0"
 clipboard = "^0.4.6"
 serde_json = "^1.0"
 libappindicator = "^0.3.0"
+
+gtk = "^0.2.0"
+gtk-sys="^0.4"

@@ -1073,10 +1073,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "totp-clipboard"
+name = "totp_clipboard"
 version = "0.1.0"
 dependencies = [
  "clipboard 0.4.6 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gtk 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "gtk-sys 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libappindicator 0.3.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "libreauth 0.8.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "log 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",

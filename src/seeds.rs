@@ -1,9 +1,9 @@
 use std::collections::HashMap;
-use std::fs::OpenOptions;
+//use std::fs::OpenOptions;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, ErrorKind};
-use std::os::unix::fs::OpenOptionsExt;
+//use std::os::unix::fs::OpenOptionsExt;
 use std::env;
 use std::path::PathBuf;
 
@@ -54,8 +54,28 @@ pub fn read_file(filepath: &str) -> io::Result<String> {
 
 
 
-type Seed = String;
-type SeedsMap = HashMap<String, Seed>;
+pub struct Seed {
+    name: String,
+    seed: String,
+}
+
+impl Seed {
+
+    pub fn name(&self) -> &str {
+        self.name.as_str()
+    }
+
+    pub fn code(&self) -> String {
+        TOTPBuilder::new()
+            .base32_key(&self.seed)
+            .finalize()
+            .unwrap()   // crash if not base 32
+            .generate()
+    }
+}
+
+
+type SeedsMap = HashMap<String, String>;
 
 #[derive(Debug, Clone)]
 pub struct Seeds {
@@ -86,21 +106,9 @@ impl Seeds {
         Ok(seeds)
     }
 
-    pub fn get_code(&self, name:&str) -> String {
-        match self.seeds.get(name) {
-            Some(ref seed) => {
-                TOTPBuilder::new()
-                    .base32_key(seed)
-                    .finalize()
-                    .unwrap()   // crash if not base 32
-                    .generate()
-            },
-            None => "".to_owned(),  // Could return an error
-        }
-    }
 
-    pub fn get_names(&self) -> Vec<String> {
-        let res = self.seeds.keys().map(|k| k.to_owned()).collect();
+    pub fn get_seeds(&self) -> Vec<Seed> {
+        let res = self.seeds.iter().map(|(key, val)|{ Seed { name: key.to_owned(), seed: val.to_owned()} } ).collect();
         res
     }
 
