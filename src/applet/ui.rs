@@ -9,6 +9,7 @@ use super::super::seeds::{Seed, Seeds};
 #[derive(Msg)]
 pub enum Msg {
     SettingClipboardContent(Seed),
+    Configuring,
 }
 
 pub struct Model {
@@ -34,6 +35,9 @@ impl Update for Applet {
                 let code = seed.code();
                 let mut clipboard: ClipboardContext = ClipboardProvider::new().unwrap();
                 clipboard.set_contents(code).unwrap();
+            }
+            Msg::Configuring => {
+                info!("Configuring Seeds");
             }
         }
     }
@@ -68,6 +72,17 @@ impl Widget for Applet {
 
             m.append(&mi);
         }
+
+        let mi = gtk::MenuItem::new_with_label("Configure...");
+
+        connect!(
+            relm,
+            mi,
+            connect_activate(_),
+            Msg::Configuring
+        );
+
+        m.append(&mi);
 
         indicator.set_menu(&mut m);
         m.show_all();
