@@ -9,6 +9,7 @@ use super::seed_editor::SeedEditor;
 #[derive(Msg)]
 pub enum Msg {
     AddingSeed(Seed),
+    Quitting
 }
 
 pub struct Model {
@@ -32,7 +33,12 @@ impl Update for Popup {
     fn update(&mut self, event: Msg) {
         match event {
             Msg::AddingSeed(seed) => {
+                info!("Adding Seed {:?}", seed);
                 self.seeds_box.add_widget::<SeedEditor>(seed);
+            },
+            Msg::Quitting => {
+                info!("Closing configuration");
+                gtk::main_quit();
             }
         }
     }
@@ -46,13 +52,11 @@ impl Widget for Popup {
     }
 
     fn view(relm: &Relm<Self>, model: Model) -> Self {
+        info!("Starting configuration view");
         let window = gtk::Window::new(gtk::WindowType::Toplevel);
         window.set_type_hint(WindowTypeHint::Dialog);
         window.set_title("Configure totp-clipboard");
 
-        for seed in model.seeds {
-            relm.stream().emit(Msg::AddingSeed(seed.clone()));
-        }
         let mainbox = gtk::Box::new(gtk::Orientation::Vertical, 0);
         mainbox.set_margin_left(20);
         mainbox.set_margin_right(20);
@@ -74,6 +78,19 @@ impl Widget for Popup {
 
         mainbox.add(&btn_box);
         window.add(&mainbox);
+
+        connect!(
+            relm,
+            window,
+            connect_delete_event(_, _),
+            return (Msg::Quitting, Inhibit(false))
+        );
+
+        for seed in model.seeds {
+            info!("Emitting Adding {:?}", seed);
+            relm.stream().emit(Msg::AddingSeed(seed.clone()));
+        }
+
         window.show_all();
         Popup {
             window: window,
