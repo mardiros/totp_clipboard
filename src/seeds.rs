@@ -51,6 +51,7 @@ pub fn read_file(filepath: &str) -> io::Result<String> {
     Ok(res)
 }
 
+#[derive(Debug, Clone)]
 pub struct Seed {
     name: String,
     seed: String,

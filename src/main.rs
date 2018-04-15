@@ -9,13 +9,19 @@ extern crate serde_json;
 
 extern crate gtk;
 
+#[macro_use]
+extern crate relm;
+#[macro_use]
+extern crate relm_derive;
+
 mod applet;
 mod seeds;
+
+use relm::Widget;
 
 fn main() {
     pretty_env_logger::init();
     info!("Starting totp-clipboard");
     let sds = seeds::Seeds::from_file().unwrap_or(seeds::Seeds::new());
-    let app = applet::Applet::new(sds);
-    app.run()
+    applet::Applet::run(sds).unwrap()
 }
