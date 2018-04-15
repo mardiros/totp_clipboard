@@ -6,22 +6,18 @@ use relm::{Relm, Update, Widget};
 
 use super::super::seeds::{Seed, Seeds};
 
-
 #[derive(Msg)]
 pub enum Msg {
     SettingClipboardContent(Seed),
 }
 
-
 pub struct Model {
     seeds: Seeds,
 }
 
-
 pub struct Applet {
-    menu: gtk::Menu
+    menu: gtk::Menu,
 }
-
 
 impl Update for Applet {
     type Model = Model;
@@ -43,9 +39,7 @@ impl Update for Applet {
     }
 }
 
-
 impl Widget for Applet {
-
     type Root = gtk::Menu;
 
     fn root(&self) -> Self::Root {
@@ -53,7 +47,6 @@ impl Widget for Applet {
     }
 
     fn view(relm: &Relm<Self>, model: Model) -> Self {
-
         let mut indicator = AppIndicator::new("totp-clipboard", "");
 
         indicator.set_icon_full(
@@ -61,8 +54,9 @@ impl Widget for Applet {
             "icon",
         );
         let mut m = gtk::Menu::new();
-
-        for seed in model.seeds.get_seeds() {
+        let seeds = model.seeds.get_seeds();
+        for seed in seeds {
+            let seed = seed.clone();
             let mi = gtk::MenuItem::new_with_label(seed.name());
 
             connect!(
@@ -78,6 +72,6 @@ impl Widget for Applet {
         indicator.set_menu(&mut m);
         m.show_all();
         indicator.set_status(AppIndicatorStatus::APP_INDICATOR_STATUS_ACTIVE);
-        Applet {menu: m}
+        Applet { menu: m }
     }
 }

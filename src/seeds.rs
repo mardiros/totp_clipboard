@@ -75,14 +75,12 @@ type SeedsMap = HashMap<String, String>;
 
 #[derive(Debug, Clone)]
 pub struct Seeds {
-    seeds: SeedsMap,
+    seeds: Vec<Seed>,
 }
 
 impl Seeds {
     pub fn new() -> Self {
-        let seeds = SeedsMap::new();
-        let seeds = Seeds { seeds: seeds };
-        seeds
+        Seeds { seeds: Vec::new() }
     }
 
     pub fn from_file() -> Result<Self, IOError> {
@@ -92,19 +90,20 @@ impl Seeds {
         let cfg = read_file(filepath)?;
         debug!("File {} readed ({} chars.)", filepath, cfg.len());
         let seeds = serde_json::from_str::<SeedsMap>(cfg.as_str()).unwrap(); // crash if the format
-        let seeds = Seeds { seeds: seeds };
         info!("Seeds loaded from file {}", filepath);
-        Ok(seeds)
-    }
-
-    pub fn get_seeds(&self) -> Vec<Seed> {
-        let res = self.seeds
+        let seeds = seeds
             .iter()
             .map(|(key, val)| Seed {
                 name: key.to_owned(),
                 seed: val.to_owned(),
             })
             .collect();
-        res
+        let seeds = Seeds { seeds: seeds };
+        info!("Seeds loaded from file {}", filepath);
+        Ok(seeds)
+    }
+
+    pub fn get_seeds(&self) -> &[Seed] {
+        self.seeds.as_slice()
     }
 }
