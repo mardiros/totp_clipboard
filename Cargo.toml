@@ -28,6 +28,7 @@ serde_json = "^1.0"
 libappindicator= { git = "https://github.com/mardiros/libappindicator-rs", branch = "features/update-gtk" }
 
 gtk = "0.4"
+gdk = "^0.8.0"
 
 relm = "^0.14.4"
 relm-derive =  "^0.14.4"

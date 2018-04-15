@@ -4,6 +4,7 @@ use clipboard::{ClipboardContext, ClipboardProvider};
 use libappindicator::{AppIndicator, AppIndicatorStatus};
 use relm::{Relm, Update, Widget};
 
+use super::super::configui::Popup;
 use super::super::seeds::{Seed, Seeds};
 
 #[derive(Msg)]
@@ -18,6 +19,7 @@ pub struct Model {
 
 pub struct Applet {
     menu: gtk::Menu,
+    model: Model,
 }
 
 impl Update for Applet {
@@ -38,6 +40,10 @@ impl Update for Applet {
             }
             Msg::Configuring => {
                 info!("Configuring Seeds");
+                //self.menu.add_widget(Popup);
+                let seeds = self.model.seeds.get_seeds().to_vec();
+                Popup::run(seeds).unwrap();
+                info!("Configuration ended");
             }
         }
     }
@@ -58,9 +64,8 @@ impl Widget for Applet {
             "icon",
         );
         let mut m = gtk::Menu::new();
-        let seeds = model.seeds.get_seeds();
+        let seeds = model.seeds.get_seeds().to_vec();
         for seed in seeds {
-            let seed = seed.clone();
             let mi = gtk::MenuItem::new_with_label(seed.name());
 
             connect!(
@@ -75,18 +80,16 @@ impl Widget for Applet {
 
         let mi = gtk::MenuItem::new_with_label("Configure...");
 
-        connect!(
-            relm,
-            mi,
-            connect_activate(_),
-            Msg::Configuring
-        );
+        connect!(relm, mi, connect_activate(_), Msg::Configuring);
 
         m.append(&mi);
 
         indicator.set_menu(&mut m);
         m.show_all();
         indicator.set_status(AppIndicatorStatus::APP_INDICATOR_STATUS_ACTIVE);
-        Applet { menu: m }
+        Applet {
+            menu: m,
+            model: model,
+        }
     }
 }

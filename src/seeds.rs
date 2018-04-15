@@ -62,6 +62,10 @@ impl Seed {
         self.name.as_str()
     }
 
+    pub fn seed(&self) -> &str {
+        self.seed.as_str()
+    }
+
     pub fn code(&self) -> String {
         TOTPBuilder::new()
             .base32_key(&self.seed)

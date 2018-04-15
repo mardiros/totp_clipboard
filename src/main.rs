@@ -7,6 +7,7 @@ extern crate libappindicator;
 extern crate libreauth;
 extern crate serde_json;
 
+extern crate gdk;
 extern crate gtk;
 
 #[macro_use]
@@ -15,6 +16,7 @@ extern crate relm;
 extern crate relm_derive;
 
 mod applet;
+mod configui;
 mod seeds;
 
 use relm::Widget;
