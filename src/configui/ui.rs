@@ -38,6 +38,7 @@ impl Update for Popup {
             },
             Msg::Quitting => {
                 info!("Closing configuration");
+                self.window.close();
                 gtk::main_quit();
             }
         }
@@ -75,6 +76,13 @@ impl Widget for Popup {
 
         let btn = gtk::Button::new_with_label("Quit without saving");
         btn_box.add(&btn);
+
+        connect!(
+            relm,
+            btn,
+            connect_clicked(_),
+            Msg::Quitting
+        );
 
         mainbox.add(&btn_box);
         window.add(&mainbox);
