@@ -8,7 +8,6 @@ extern crate libreauth;
 extern crate serde_json;
 
 extern crate gtk;
-extern crate gtk_sys;
 
 mod applet;
 mod seeds;

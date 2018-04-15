@@ -25,7 +25,6 @@ pretty_env_logger = "^0.2"
 libreauth = "^0.8.0"
 clipboard = "^0.4.6"
 serde_json = "^1.0"
-libappindicator = "^0.3.0"
+libappindicator= { git = "https://github.com/mardiros/libappindicator-rs", branch = "features/update-gtk" }
 
-gtk = "^0.2.0"
-gtk-sys="^0.4"
+gtk = "0.4"
