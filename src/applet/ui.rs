@@ -19,7 +19,6 @@ pub struct Model {
 
 pub struct Applet {
     menu: gtk::Menu,
-    model: Model,
 }
 
 impl Update for Applet {
@@ -40,9 +39,7 @@ impl Update for Applet {
             }
             Msg::Configuring => {
                 info!("Configuring Seeds");
-                //self.menu.add_widget(Popup);
-                let seeds = self.model.seeds.get_seeds().to_vec();
-                Popup::run(seeds).unwrap();
+                Popup::run(()).unwrap();
                 info!("Configuration ended");
             }
         }
@@ -87,9 +84,6 @@ impl Widget for Applet {
         indicator.set_menu(&mut m);
         m.show_all();
         indicator.set_status(AppIndicatorStatus::APP_INDICATOR_STATUS_ACTIVE);
-        Applet {
-            menu: m,
-            model: model,
-        }
+        Applet { menu: m }
     }
 }

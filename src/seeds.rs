@@ -1,10 +1,10 @@
 use std::collections::HashMap;
-//use std::fs::OpenOptions;
+use std::env;
+use std::fs::OpenOptions;
 use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, ErrorKind};
-//use std::os::unix::fs::OpenOptionsExt;
-use std::env;
+use std::os::unix::fs::OpenOptionsExt;
 use std::path::PathBuf;
 
 use libreauth::oath::TOTPBuilder;
@@ -49,6 +49,17 @@ pub fn read_file(filepath: &str) -> io::Result<String> {
     file.read_to_end(&mut buf)?;
     let res = String::from_utf8(buf).unwrap(); // crash if UTF8 error
     Ok(res)
+}
+
+pub fn write_file(filepath: &str, filecontent: &str) -> io::Result<()> {
+    let mut file = OpenOptions::new()
+        .mode(0o600)
+        .write(true)
+        .create(true)
+        .truncate(true)
+        .open(filepath)?;
+    file.write_all(filecontent.as_bytes())?;
+    Ok(())
 }
 
 #[derive(Debug, Clone)]
@@ -109,5 +120,29 @@ impl Seeds {
 
     pub fn get_seeds(&self) -> &[Seed] {
         self.seeds.as_slice()
+    }
+
+    pub fn sync(&self) -> Result<(), IOError> {
+        let filepath = config_file()?;
+        let filepath = filepath.to_str().unwrap(); // crash if ??
+        let mut payload: SeedsMap = HashMap::new();
+
+        for seed in self.seeds.iter() {
+            payload.insert(seed.name().to_owned(), seed.seed().to_owned());
+        }
+
+        info!("Writing seeds in file {}", filepath);
+        let filecontent = serde_json::to_string_pretty(&payload);
+        let filecontent =
+            filecontent.expect("Unable to save workspace, cannot serializing it to json");
+
+        write_file(filepath, filecontent.as_str())?;
+        Ok(())
+    }
+
+    pub fn safe_sync(&self) {
+        self.sync().unwrap_or_else(|err| {
+            error!{"Seeds not synchronized: {}", err}
+        });
     }
 }
