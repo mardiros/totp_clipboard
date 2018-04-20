@@ -77,6 +77,10 @@ impl Seed {
         self.seed.as_str()
     }
 
+    pub fn set_name(&mut self, name: &str) {
+        self.name = name.to_owned();
+    }
+
     pub fn set_seed(&mut self, seed: &str) {
         self.seed = seed.to_owned();
     }

@@ -11,6 +11,7 @@ use super::seed_editor::{Msg as MsgSeedEditor, SeedEditor};
 #[derive(Msg)]
 pub enum Msg {
     AddingSeed(Seed),
+    NameUpdated(String, String),
     SeedUpdated(String, String),
     Saving,
     Quitting,
@@ -22,18 +23,19 @@ pub struct Model {
 
 impl Model {
     pub fn set_name(&mut self, oldname: &str, newname: &str) {
-        let seed = self.seedmap.remove(oldname).unwrap(); // crash if ?
-        self.seedmap.insert(newname.to_owned(), seed);
+        if let Some(seed) = self.seedmap.remove(oldname) {
+            self.seedmap.insert(newname.to_owned(), seed);
+        } else {
+            error!("Not seed {} in the seedmap", oldname);
+        }
     }
 
     pub fn set_seed(&mut self, name: &str, newseed: &str) {
         if let Some(seed) = self.seedmap.get_mut(name) {
             *seed = newseed.to_owned();
-        }
-        else {
+        } else {
             error!("Not seed {} in the seedmap", name);
         }
-
     }
 
     pub fn to_seeds(&self) -> Vec<Seed> {
@@ -74,6 +76,12 @@ impl Update for Popup {
                 if !self.seeds_editor.contains_key(&seed_name) {
                     let editor = self.seeds_box.add_widget::<SeedEditor>(seed);
                     connect!(
+                        editor@MsgSeedEditor::NameUpdated(ref oldname, ref newname),
+                        self.relm,
+                        Msg::NameUpdated(oldname.to_owned(), newname.to_owned())
+                    );
+
+                    connect!(
                         editor@MsgSeedEditor::SeedUpdated(ref name, ref seed),
                         self.relm,
                         Msg::SeedUpdated(name.to_owned(), seed.to_owned())
@@ -94,6 +102,10 @@ impl Update for Popup {
             Msg::SeedUpdated(name, seed) => {
                 error!("Updating seed of {}", name);
                 self.model.set_seed(name.as_str(), seed.as_str());
+            }
+            Msg::NameUpdated(oldname, newname) => {
+                error!("Updating name of {}", oldname);
+                self.model.set_name(oldname.as_str(), newname.as_str());
             }
         }
     }

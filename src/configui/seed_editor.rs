@@ -7,6 +7,8 @@ use super::super::seeds::Seed;
 #[derive(Msg)]
 pub enum Msg {
     SeedFocusLost,
+    NameFocusLost,
+    NameUpdated(String, String),
     SeedUpdated(String, String),
 }
 
@@ -17,6 +19,7 @@ pub struct Model {
 pub struct SeedEditor {
     relm: Relm<SeedEditor>,
     hbox: gtk::Box,
+    name_entry: gtk::Entry,
     seed_entry: gtk::Entry,
     model: Model,
 }
@@ -44,6 +47,20 @@ impl Update for SeedEditor {
                     ));
                 }
             }
+
+            Msg::NameFocusLost => {
+                let name = self.name_entry.get_text().unwrap();
+                info!("Focus lost on {:?}", self.model.seed.name());
+                if self.model.seed.name() != name {
+                    info!("Seed updated {}", self.model.seed.name());
+                    let oldname = self.model.seed.name().to_owned();
+                    self.model.seed.set_name(&name);
+                    self.relm
+                        .stream()
+                        .emit(Msg::NameUpdated(oldname, name.to_owned()));
+                }
+            }
+
             _ => {}
         }
     }
@@ -64,7 +81,19 @@ impl Widget for SeedEditor {
 
         let name_entry = gtk::Entry::new();
         name_entry.set_text(model.seed.name());
+        connect!(
+            relm,
+            name_entry,
+            connect_focus_out_event(_, _),
+            return (Msg::NameFocusLost, Inhibit(false))
+        );
         name_entry.set_can_focus(true);
+        connect!(
+            relm,
+            name_entry,
+            connect_focus_out_event(_, _),
+            return (Msg::NameFocusLost, Inhibit(false))
+        );
         hbox.add(&name_entry);
 
         let label = gtk::Label::new("Seed:");
@@ -89,6 +118,7 @@ impl Widget for SeedEditor {
         SeedEditor {
             relm: relm.clone(),
             hbox: hbox,
+            name_entry: name_entry,
             seed_entry: seed_entry,
             model: model,
         }
