@@ -77,6 +77,10 @@ impl Seed {
         self.seed.as_str()
     }
 
+    pub fn set_seed(&mut self, seed: &str) {
+        self.seed = seed.to_owned();
+    }
+
     pub fn code(&self) -> String {
         TOTPBuilder::new()
             .base32_key(&self.seed)
@@ -86,7 +90,36 @@ impl Seed {
     }
 }
 
-type SeedsMap = HashMap<String, String>;
+pub type SeedMap = HashMap<String, String>;
+
+pub trait SeedMapIO {
+    fn from_file() -> Result<SeedMap, IOError>;
+    fn to_file(&self) -> Result<(), IOError>;
+}
+
+impl SeedMapIO for SeedMap {
+    fn from_file() -> Result<SeedMap, IOError> {
+        let filepath = config_file()?;
+        let filepath = filepath.to_str().unwrap(); // crash if ??
+        info!("Try loading seedmap from file {}", filepath);
+        let cfg = read_file(filepath)?;
+        debug!("File {} readed ({} chars.)", filepath, cfg.len());
+        let seedmap = serde_json::from_str::<SeedMap>(cfg.as_str()).unwrap(); // crash if the format
+        Ok(seedmap)
+    }
+    fn to_file(&self) -> Result<(), IOError> {
+        let filepath = config_file()?;
+        let filepath = filepath.to_str().unwrap(); // crash if ??
+
+        info!("Writing seeds in file {}", filepath);
+        let filecontent = serde_json::to_string_pretty(&self);
+        let filecontent =
+            filecontent.expect("Unable to save workspace, cannot serializing it to json");
+
+        write_file(filepath, filecontent.as_str())?;
+        Ok(())
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Seeds {
@@ -99,50 +132,23 @@ impl Seeds {
     }
 
     pub fn from_file() -> Result<Self, IOError> {
-        let filepath = config_file()?;
-        let filepath = filepath.to_str().unwrap(); // crash if ??
-        info!("Try loading workspace from file {}", filepath);
-        let cfg = read_file(filepath)?;
-        debug!("File {} readed ({} chars.)", filepath, cfg.len());
-        let seeds = serde_json::from_str::<SeedsMap>(cfg.as_str()).unwrap(); // crash if the format
-        info!("Seeds loaded from file {}", filepath);
-        let seeds = seeds
+        let seedmap = SeedMap::from_file()?;
+        Ok(Self::from_seedmap(&seedmap))
+    }
+
+    pub fn from_seedmap(seedmap: &SeedMap) -> Self {
+        let seeds = seedmap
             .iter()
             .map(|(key, val)| Seed {
                 name: key.to_owned(),
                 seed: val.to_owned(),
             })
             .collect();
-        let seeds = Seeds { seeds: seeds };
-        info!("Seeds loaded from file {}", filepath);
-        Ok(seeds)
+        info!("Seeds loaded from SeedMap");
+        Seeds { seeds: seeds }
     }
 
     pub fn get_seeds(&self) -> &[Seed] {
         self.seeds.as_slice()
-    }
-
-    pub fn sync(&self) -> Result<(), IOError> {
-        let filepath = config_file()?;
-        let filepath = filepath.to_str().unwrap(); // crash if ??
-        let mut payload: SeedsMap = HashMap::new();
-
-        for seed in self.seeds.iter() {
-            payload.insert(seed.name().to_owned(), seed.seed().to_owned());
-        }
-
-        info!("Writing seeds in file {}", filepath);
-        let filecontent = serde_json::to_string_pretty(&payload);
-        let filecontent =
-            filecontent.expect("Unable to save workspace, cannot serializing it to json");
-
-        write_file(filepath, filecontent.as_str())?;
-        Ok(())
-    }
-
-    pub fn safe_sync(&self) {
-        self.sync().unwrap_or_else(|err| {
-            error!{"Seeds not synchronized: {}", err}
-        });
     }
 }

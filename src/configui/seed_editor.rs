@@ -6,6 +6,8 @@ use super::super::seeds::Seed;
 
 #[derive(Msg)]
 pub enum Msg {
+    SeedFocusLost,
+    SeedUpdated(String, String),
 }
 
 pub struct Model {
@@ -13,7 +15,10 @@ pub struct Model {
 }
 
 pub struct SeedEditor {
+    relm: Relm<SeedEditor>,
     hbox: gtk::Box,
+    seed_entry: gtk::Entry,
+    model: Model,
 }
 
 impl Update for SeedEditor {
@@ -26,7 +31,21 @@ impl Update for SeedEditor {
     }
 
     fn update(&mut self, event: Msg) {
-        match event {}
+        match event {
+            Msg::SeedFocusLost => {
+                let seed = self.seed_entry.get_text().unwrap();
+                info!("Focus lost on {:?}", self.model.seed.name());
+                if self.model.seed.seed() != seed {
+                    info!("Seed updated {}", self.model.seed.name());
+                    self.model.seed.set_seed(&seed);
+                    self.relm.stream().emit(Msg::SeedUpdated(
+                        self.model.seed.name().to_owned(),
+                        seed.to_owned(),
+                    ));
+                }
+            }
+            _ => {}
+        }
     }
 }
 
@@ -43,23 +62,35 @@ impl Widget for SeedEditor {
         let label = gtk::Label::new("Name:");
         hbox.add(&label);
 
-        let entry = gtk::Entry::new();
-        entry.set_text(model.seed.name());
-        entry.set_can_focus(true);
-        hbox.add(&entry);
+        let name_entry = gtk::Entry::new();
+        name_entry.set_text(model.seed.name());
+        name_entry.set_can_focus(true);
+        hbox.add(&name_entry);
 
         let label = gtk::Label::new("Seed:");
         hbox.add(&label);
 
-        let entry = gtk::Entry::new();
-        entry.set_text(model.seed.seed());
-        entry.set_can_focus(true);
-        hbox.add(&entry);
+        let seed_entry = gtk::Entry::new();
+        seed_entry.set_text(model.seed.seed());
+        seed_entry.set_can_focus(true);
+        connect!(
+            relm,
+            seed_entry,
+            connect_focus_out_event(_, _),
+            return (Msg::SeedFocusLost, Inhibit(false))
+        );
+
+        hbox.add(&seed_entry);
 
         let btn = gtk::Button::new_with_label("Remove");
         hbox.add(&btn);
 
         hbox.show_all();
-        SeedEditor { hbox: hbox }
+        SeedEditor {
+            relm: relm.clone(),
+            hbox: hbox,
+            seed_entry: seed_entry,
+            model: model,
+        }
     }
 }
