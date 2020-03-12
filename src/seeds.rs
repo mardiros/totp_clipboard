@@ -4,16 +4,16 @@ use std::fs::{self, File};
 use std::io::prelude::*;
 use std::io::{self, ErrorKind};
 //use std::os::unix::fs::OpenOptionsExt;
-use std::env;
 use std::path::PathBuf;
 
+use dirs;
 use libreauth::oath::TOTPBuilder;
 use serde_json;
 
 pub type IOError = io::Error;
 
 fn home_dir() -> io::Result<PathBuf> {
-    match env::home_dir() {
+    match dirs::home_dir() {
         Some(path) => Ok(path),
         None => Err(IOError::new(
             ErrorKind::NotFound,
@@ -87,12 +87,9 @@ impl Seeds {
     pub fn from_file() -> Result<Self, IOError> {
         let filepath = config_file()?;
         let filepath = filepath.to_str().unwrap(); // crash if ??
-        info!("Try loading workspace from file {}", filepath);
         let cfg = read_file(filepath)?;
-        debug!("File {} readed ({} chars.)", filepath, cfg.len());
         let seeds = serde_json::from_str::<SeedsMap>(cfg.as_str()).unwrap(); // crash if the format
         let seeds = Seeds { seeds: seeds };
-        info!("Seeds loaded from file {}", filepath);
         Ok(seeds)
     }
 

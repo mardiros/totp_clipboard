@@ -19,3 +19,11 @@ You can edit the file manually to add seeds by writing this file.
 The file permission shoud be `-rw-------`.
 
 The file format is `{"seed label": "BASE32 ENCODED SEED", "seed label2": "ANOTHER BASE32 ENCODED SEED"}`.
+
+
+## Compiling
+
+```
+sudo pacman -S gtk3 adwaita-icon-theme libappindicator3 clang
+cargo build --release
+```
