@@ -19,7 +19,7 @@ impl Applet {
         let mut indicator = AppIndicator::new("totp-clipboard", "");
 
         indicator.set_icon_full(
-            "/usr/share/icons/hicolor/22x22/apps/gcr-key.png",
+            "/usr/share/icons/Adwaita/22x22/legacy/changes-prevent.png",
             "icon",
         );
         let mut m = gtk::Menu::new();
