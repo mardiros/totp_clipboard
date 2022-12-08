@@ -23,6 +23,7 @@ The file format is `{"seed label": "BASE32 ENCODED SEED", "seed label2": "ANOTHE
 ## Installation (Archlinux)
 
 ```
-sudo pacman -S gtk3 adwaita-icon-theme libappindicator3 clang
+sudo pacman -S gtk3 adwaita-icon-theme libappindicator-gtk3 clang
 cargo install totp_clipboard
 ```
+0
