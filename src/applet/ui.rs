@@ -1,4 +1,7 @@
-use gtk::{self, GtkMenuItemExt, MenuShellExt, WidgetExt};
+use gtk::prelude::GtkMenuItemExt;
+use gtk::prelude::MenuShellExt;
+use gtk::prelude::WidgetExt;
+use gtk;
 
 use clipboard::{ClipboardContext, ClipboardProvider};
 use libappindicator::{AppIndicator, AppIndicatorStatus};
@@ -19,13 +22,13 @@ impl Applet {
         let mut indicator = AppIndicator::new("totp-clipboard", "");
 
         indicator.set_icon_full(
-            "/usr/share/icons/Adwaita/22x22/legacy/changes-prevent.png",
-            "icon",
+            "/usr/share/icons/Adwaita/22x22/emblems/emblem-readonly.png",
+            "Open the totpd menu",
         );
         let mut m = gtk::Menu::new();
 
         for seed in self.seeds.get_seeds() {
-            let mi = gtk::MenuItem::new_with_label(seed.name());
+            let mi = gtk::MenuItem::with_label(seed.name());
 
             mi.connect_activate(move |_| {
                 let code = seed.code();
